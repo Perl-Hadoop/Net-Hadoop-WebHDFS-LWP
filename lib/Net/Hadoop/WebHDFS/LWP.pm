@@ -145,9 +145,9 @@ Net::Hadoop::WebHDFS::LWP - Client library for Hadoop WebHDFS and HttpFs, with K
 
 This module is a quick and dirty hack to add Kerberos support to Satoshi
 Tagomori's module L<Net::Hadoop::WebHDFS>, to access Hadoop secure clusters. It
-simply subclasses the original module, substituting LWP to Furl, which
-transparently use LWP::Auth::Negotiate when needed. The real documentation is 
-contained in Net::Hadoop::WebHDFS
+simply subclasses the original module, replacing L<Furl> with L<LWP>, which
+will transparently use L<LWP::Auth::Negotiate> when needed. So the real
+documentation is contained in L<Net::Hadoop::WebHDFS>.
 
 =head1 ACKNOWLEDGEMENTS
 
