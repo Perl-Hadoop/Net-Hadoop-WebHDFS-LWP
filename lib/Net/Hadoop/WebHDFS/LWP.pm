@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use parent 'Net::Hadoop::WebHDFS';
 
+# VERSION
+
 use LWP::UserAgent;
 use Carp;
 
