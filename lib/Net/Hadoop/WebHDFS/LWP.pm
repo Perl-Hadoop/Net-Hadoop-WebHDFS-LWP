@@ -7,7 +7,7 @@ use parent 'Net::Hadoop::WebHDFS';
 use LWP::UserAgent;
 use Carp;
 
-our $VERSION = 0.01;
+our $VERSION = 0.001;
 
 sub new {
     my $class   = shift;
@@ -82,9 +82,10 @@ sub request {
     # we still may get this error on a secure cluster, when the credentials 
     # cache hasn't been initialized
     elsif ( $code == 401 ) {
-        my $extramsg
-            = ( $headers->{'www-authenticate'} || '' ) eq 'Negotiate'
-            ? ' (Did you forget to run kinit?)'
+        my $extramsg = ( $headers->{'www-authenticate'} || '' ) eq 'Negotiate'
+            ? eval { require "LWP::Authen::Negotiate" }
+                ? ' (Did you forget to run kinit?)'
+                : ' (LWP::Authen::Negotiate doesn\'t seem available)'
             : '';
         croak "SecurityError$extramsg: $errmsg";
     }
