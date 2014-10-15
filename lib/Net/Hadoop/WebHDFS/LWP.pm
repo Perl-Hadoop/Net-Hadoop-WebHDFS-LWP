@@ -7,8 +7,6 @@ use parent 'Net::Hadoop::WebHDFS';
 use LWP::UserAgent;
 use Carp;
 
-our $VERSION = 0.001;
-
 sub new {
     my $class   = shift;
     my %options = @_;
@@ -121,9 +119,7 @@ sub request {
 
 1;
 
-=head1 NAME
-
-Net::Hadoop::WebHDFS::LWP - Client library for Hadoop WebHDFS and HttpFs, with Kerberos support
+#ABSTRACT: Client library for Hadoop WebHDFS and HttpFs, with Kerberos support
 
 =head1 SYNOPSIS
 
@@ -155,8 +151,4 @@ documentation is contained in L<Net::Hadoop::WebHDFS>.
 As mentioned above, the real work was done by Satoshi Tagomori
 
 Thanks to my employer Booking.com to allow me to release this module for public use
-
-=head1 COPYRIGHT or LICENSE
-
-licensed under the same terms as perl itself
 
