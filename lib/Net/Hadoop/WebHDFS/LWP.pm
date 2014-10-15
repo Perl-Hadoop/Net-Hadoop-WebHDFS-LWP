@@ -153,8 +153,9 @@ contained in Net::Hadoop::WebHDFS
 
 As mentioned above, the real work was done by Satoshi Tagomori
 
+Thanks to my employer Booking.com to allow me to release this module for public use
+
 =head1 COPYRIGHT or LICENSE
 
 licensed under the same terms as perl itself
-
 
