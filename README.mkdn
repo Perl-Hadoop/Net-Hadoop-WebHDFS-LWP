@@ -4,7 +4,7 @@ Net::Hadoop::WebHDFS::LWP - Client library for Hadoop WebHDFS and HttpFs, with K
 
 # VERSION
 
-version 0.001
+version 0.002
 
 # SYNOPSIS
 
