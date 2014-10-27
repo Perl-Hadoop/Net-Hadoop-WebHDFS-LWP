@@ -9,6 +9,7 @@ use parent 'Net::Hadoop::WebHDFS';
 use LWP::UserAgent;
 use Carp;
 use Scalar::Util 'openhandle';
+use HTTP::Request::StreamingUpload;
 
 sub new {
     my $class   = shift;
@@ -30,6 +31,9 @@ sub new {
     $self->{timeout} = $options{timeout} || 30;
     $self->{ua}->timeout( $self->{timeout} );
 
+    # For filehandle upload support
+    $self->{chunksize} = $options{chunksize} || 4096;
+
     return $self;
 }
 
@@ -50,19 +54,22 @@ sub request {
 
     print "URI : $uri\n" if $self->{debug};
 
-    my $req = HTTP::Request->new( $method => $uri );
+    my $req;
 
-    # TODO refer to http://www.perlmonks.org/?node_id=761560 when uploading large files becomes a problem
-    if (length $payload) {
+    if ( length $payload ) {
         if ( openhandle($payload) ) {
-            $req->content(
-                do { local $/; <$payload> }
+            $req = HTTP::Request::StreamingUpload->new(
+                $method => $uri,
+                fh      => $payload,
+                headers    => HTTP::Headers->new( 'Content-Length' => -s $payload, ),
+                chunk_size => $self->{chunksize},
             );
         }
         elsif ( ref $payload ) {
             croak __PACKAGE__ . " does not accept refs as content, only scalars and FH";
         }
         else {
+            $req = HTTP::Request->new( $method => $uri );
             $req->content($payload);
         }
     }
