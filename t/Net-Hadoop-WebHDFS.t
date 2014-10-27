@@ -5,6 +5,7 @@ use Test::More;
 use Test::Deep;
 use File::Temp qw(tmpnam);
 use File::Basename;
+use Data::Dumper;
 
 my $tmpnam = basename tmpnam;
 
@@ -17,27 +18,38 @@ my ( $WEBHDFS_HOST, $WEBHDFS_PORT, $WEBHDFS_USER )
     = @ENV{qw(WEBHDFS_HOST WEBHDFS_PORT WEBHDFS_USER)};
 
 SKIP: {
-    skip 'WEBHDFS_HOST and WEBHDFS_USER must be defined in environment', 3
-        if !$WEBHDFS_USER || !$WEBHDFS_HOST;
+    skip 'WEBHDFS_HOST must be defined in environment', 4
+        if !$WEBHDFS_HOST;
 
     ok( my $client = Net::Hadoop::WebHDFS::LWP->new(
             host        => $WEBHDFS_HOST,
             port        => $WEBHDFS_PORT || 14000,
-            username    => $WEBHDFS_USER,
+            username    => $WEBHDFS_USER || "johndoe",
             httpfs_mode => 1,
-        )
+        ),
+        "create a client",
     );
     ok( $client->create(
             '/tmp/Net-Hadoop-WebHDFS-LWP-test-' . $tmpnam,
             "this is a test",    # content
             permission => '644',
             overwrite  => 'true'
-        )
+        ),
+        "write a file in /tmp"
+    );
+    ok( do {
+            my $file;
+            $file = $client->stat( '/tmp/Net-Hadoop-WebHDFS-LWP-test-' . $tmpnam );
+            $file->{replication} > 0;
+        },
+        "get file info",
     );
     ok( $client->delete(
             '/tmp/Net-Hadoop-WebHDFS-LWP-test-' . $tmpnam,
-        )
+        ),
+        "delete the file"
     );
 }
 
 done_testing;
+
