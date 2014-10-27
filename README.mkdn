@@ -4,12 +4,12 @@ Net::Hadoop::WebHDFS::LWP - Client library for Hadoop WebHDFS and HttpFs, with K
 
 # VERSION
 
-version 0.002
+version 0.003
 
 # SYNOPSIS
 
     use Net::Hadoop::WebHDFS::LWP;
-    
+
     my $client = Net::Hadoop::WebHDFS::LWP->new(
         host        => 'webhdfs.local',
         port        => 14000,
