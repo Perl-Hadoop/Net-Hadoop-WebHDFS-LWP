@@ -1,4 +1,7 @@
 Revision history for Net-Hadoop-WebHDFS-LWP
 
+0.007   2016-05-27
+        Fix for RT#114762
+
 0.006   2016-05-26
         Fix for RT#109101: "libwww" specified in TEST_REQUIRES

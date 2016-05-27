@@ -8,7 +8,8 @@ use parent 'Net::Hadoop::WebHDFS';
 
 use LWP::UserAgent;
 use Carp;
-use Scalar::Util 'openhandle';
+use Ref::Util    qw( is_arrayref );
+use Scalar::Util qw( openhandle );
 use HTTP::Request::StreamingUpload;
 
 sub new {
@@ -24,7 +25,7 @@ sub new {
     $self->{debug} = $debug;
 
     $self->{ua} = LWP::UserAgent->new;
-    $self->{ua}->agent("Net::Hadoop::WebHDFS::LWP $VERSION");
+    $self->{ua}->agent("Net::Hadoop::WebHDFS::LWP " . $class->VERSION );
     $self->{useragent} = $self->{ua}->agent;
 
     # default timeout is a bit short, raise it
@@ -72,9 +73,12 @@ sub request {
         $req->content($payload);
     }
 
-    while ( my ( $h_field, $h_value ) = splice( $header || [], 0, 2 ) ) {
-        $req->header( $h_field => $h_value );
+    if ( is_arrayref( $header ) ) {
+        while ( my ( $h_field, $h_value ) = splice( @{ $header }, 0, 2 ) ) {
+            $req->header( $h_field => $h_value );
+        }
     }
+
     my $real_res = $self->{ua}->request($req);
 
     my $res = { code => $real_res->code, body => $real_res->decoded_content };
