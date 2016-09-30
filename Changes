@@ -1,5 +1,10 @@
 Revision history for Net-Hadoop-WebHDFS-LWP
 
+0.008   2016-09-30
+        Pass proxy settings to the UA object (Yati Sagade).
+        Net::Hadoop::WebHDFS dependency bumped to have new methods in there available
+        form this module as well.
+
 0.007   2016-05-27
         Fix for RT#114762
 
