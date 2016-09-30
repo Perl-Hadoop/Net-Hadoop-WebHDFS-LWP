@@ -24,7 +24,13 @@ sub new {
     delete $self->{furl};
     $self->{debug} = $debug;
 
-    $self->{ua} = LWP::UserAgent->new;
+    my %ua_opts;
+    for my $passthru_opt (qw/ env_proxy proxy no_proxy /) {
+        $ua_opts{$passthru_opt} = $options{$passthru_opt}
+            if ( exists $options{$passthru_opt} );
+    }
+
+    $self->{ua} = LWP::UserAgent->new( %ua_opts );
     $self->{ua}->agent("Net::Hadoop::WebHDFS::LWP " . $class->VERSION );
     $self->{useragent} = $self->{ua}->agent;
 
