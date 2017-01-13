@@ -114,15 +114,15 @@ sub request {
     # cache hasn't been initialized
     elsif ( $code == 401 ) {
         my $extramsg = ( $headers->{'www-authenticate'} || '' ) eq 'Negotiate'
-            ? eval { require "LWP::Authen::Negotiate" }
-                ? ' (Did you forget to run kinit?)'
-                : ' (LWP::Authen::Negotiate doesn\'t seem available)'
+            ? eval { require LWP::Authen::Negotiate; 1; }
+                ? q{ (Did you forget to run kinit?)}
+                : q{ (LWP::Authen::Negotiate doesn't seem available)}
             : '';
         croak "SecurityError$extramsg: $errmsg";
     }
 
     elsif ( $code == 403 ) {
-        if ( $errmsg =~ /org\.apache\.hadoop\.ipc\.StandbyException/ ) {
+        if ( $errmsg =~ m{ \Qorg.apache.hadoop.ipc.StandbyException\E }xms ) {
             if ( $self->{httpfs_mode} || not defined( $self->{standby_host} ) ) {
 
                 # failover is disabled
