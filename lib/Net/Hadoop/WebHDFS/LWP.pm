@@ -160,6 +160,8 @@ sub request {
 
 1;
 
+__END__
+
 #ABSTRACT: Client library for Hadoop WebHDFS and HttpFs, with Kerberos support
 
 =head1 SYNOPSIS
@@ -192,4 +194,3 @@ documentation is contained in L<Net::Hadoop::WebHDFS>.
 As mentioned above, the real work was done by Satoshi Tagomori
 
 Thanks to my employer Booking.com to allow me to release this module for public use
-
