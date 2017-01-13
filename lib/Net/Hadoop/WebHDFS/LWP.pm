@@ -31,7 +31,7 @@ sub new {
     }
 
     $self->{ua} = LWP::UserAgent->new( %ua_opts );
-    $self->{ua}->agent("Net::Hadoop::WebHDFS::LWP " . $class->VERSION );
+    $self->{ua}->agent("Net::Hadoop::WebHDFS::LWP " . $class->VERSION || 'beta' );
     $self->{useragent} = $self->{ua}->agent;
 
     # default timeout is a bit short, raise it
