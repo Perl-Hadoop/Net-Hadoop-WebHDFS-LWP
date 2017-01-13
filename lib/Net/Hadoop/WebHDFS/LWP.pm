@@ -135,9 +135,17 @@ sub request {
             else {
                 $self->{under_failover} = not $self->{under_failover};
                 $self->{retrying}       = 1;
-                my ( $next_host, $next_port ) = $self->connect_to();
-                my $val = $self->request( $next_host, $next_port, $method, $path, $op, $params,
-                    $payload, $header );
+                my ( $next_host, $next_port ) = $self->connect_to;
+                my $val = $self->request(
+                                $next_host,
+                                $next_port,
+                                $method,
+                                $path,
+                                $op,
+                                $params,
+                                $payload,
+                                $header,
+                            );
                 $self->{retrying} = 0;
                 return $val;
             }
