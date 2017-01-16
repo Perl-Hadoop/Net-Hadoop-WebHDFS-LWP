@@ -21,7 +21,7 @@ use constant UA_PASSTHROUGH_OPTIONS => qw(
 sub new {
     my $class   = shift;
     my %options = @_;
-    my $debug   = $options{debug} || 0;
+    my $debug   = delete $options{debug} || 0;
     require Data::Dumper if $debug;
 
     my $self = $class->SUPER::new(@_);
@@ -69,7 +69,7 @@ sub request {
     $uri->port($port);
     $uri->scheme('http'); # no ssl for webhdfs? check the docs
 
-    print "URI : $uri\n" if $self->{debug};
+    printf STDERR "URI : %s\n", $uri if $self->{debug};
 
     my $req;
 
@@ -99,10 +99,13 @@ sub request {
 
     my $res = { code => $real_res->code, body => $real_res->decoded_content };
     my $code = $real_res->code;
-    print "HTTP code : $code\n" if $self->{debug};
+
+    printf STDERR "HTTP code : %s\n", $code if $self->{debug};
 
     my $headers = $real_res->headers;
-    print "Headers: " . Data::Dumper::Dumper $headers if $self->{debug};
+
+    printf STDERR "Headers: %s", Data::Dumper::Dumper $headers if $self->{debug};
+
     for my $h_key ( keys %{ $headers || {} } ) {
         my $h_value = $headers->{$h_key};
 
@@ -205,7 +208,7 @@ sub _parse_error_from_html {
 
     if ( ! eval { require HTML::Parser;} ) {
         if ( $self->{debug} ) {
-            warn "Tried to parse HTML error message but HTML::Parser is not available!";
+            printf STDERR "Tried to parse the HTML error message but HTML::Parser is not available!\n";
         }
         return;
     }
