@@ -184,10 +184,11 @@ sub request {
         croak "ServerError: $errmsg";
     }
     else {
-        croak "RequestFailedError, code:$code, message:$errmsg";
+        # do nothing
     }
 
-    return;
+    # catch-all exception
+    croak "RequestFailedError, code:$code, message:$errmsg";
 }
 
 sub _parse_error_from_html {
