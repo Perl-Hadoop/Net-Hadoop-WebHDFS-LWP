@@ -116,6 +116,19 @@ sub request {
     my $errmsg = $res->{body} || 'Response body is empty...';
     $errmsg =~ s/\n//g;
 
+    my %html_error;
+    if ( $errmsg =~ m{ \A <html.+?> }xmsi ) {
+        if ( my @error = $self->_parse_error_from_html( $errmsg ) ) {
+            %html_error = @error;
+            my @flat;
+            while ( my ( $key, $val ) = splice( @error, 0, 2 ) ) {
+                push @flat, "$key: $val"
+            }
+            # reset to something meaningful now that we've removed the html cruft
+            $errmsg = join '. ', @flat;
+        }
+    }
+
     if ( $code == 400 ) { croak "ClientError: $errmsg"; }
 
     # this error happens for secure clusters when using Net::Hadoop::WebHDFS,
@@ -166,6 +179,57 @@ sub request {
     elsif ( $code == 500 ) { croak "ServerError: $errmsg"; }
 
     croak "RequestFailedError, code:$code, message:$errmsg";
+}
+
+sub _parse_error_from_html {
+    # This is a brittle function as it assumes certain things to be present
+    # in the HTML output and will most likely break with future updates.
+    # However the interface returns HTML in certain cases (like secure clusters)
+    # and currently that's a failure on the backend where we can;t fix things.
+    #
+    # In any case, the program should default to the original message fetched,
+    # if this fails for any reason.
+    #
+    my $self   = shift;
+    my $errmsg = shift;
+
+    if ( ! eval { require HTML::Parser;} ) {
+        if ( $self->{debug} ) {
+            warn "Tried to parse HTML error message but HTML::Parser is not available!";
+        }
+        return;
+    }
+
+    my @errors;
+    my $p = HTML::Parser->new(
+                api_version => 3,
+                handlers    => {
+                    text => [
+                        \@errors,
+                        'event,text',
+                    ],
+                }
+            );
+    $p->parse( $errmsg );
+
+    my @flat =  map {;
+                    s{ \A \s+    }{}xmsg;
+                    s{    \s+ \z }{}xmsg;
+                    $_;
+                }
+                grep {
+                       $_ !~ m{ \Q<!--\E    }xms # comment
+                    && $_ !~ m{ \A Apache\b }xms # Tomcat version, etc.
+                    && $_ !~ m{ \A \s+ \z   }xms # " "
+                }
+                map { $_->[1] }
+                @errors;
+
+    if ( @flat % 2 ) {
+        unshift @flat, 'http_status';
+    }
+
+    return @flat;
 }
 
 1;
