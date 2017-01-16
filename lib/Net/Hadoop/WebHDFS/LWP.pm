@@ -12,6 +12,12 @@ use Ref::Util    qw( is_arrayref );
 use Scalar::Util qw( openhandle );
 use HTTP::Request::StreamingUpload;
 
+use constant UA_PASSTHROUGH_OPTIONS => qw(
+    env_proxy
+    no_proxy
+    proxy
+);
+
 sub new {
     my $class   = shift;
     my %options = @_;
@@ -24,11 +30,11 @@ sub new {
     delete $self->{furl};
     $self->{debug} = $debug;
 
-    my %ua_opts;
-    for my $passthru_opt (qw/ env_proxy proxy no_proxy /) {
-        $ua_opts{$passthru_opt} = $options{$passthru_opt}
-            if ( exists $options{$passthru_opt} );
-    }
+    my %ua_opts = map {
+        exists $options{$_} ? (
+            $_ => $options{ $_ }
+        ) : ()
+    } UA_PASSTHROUGH_OPTIONS;
 
     $self->{ua} = LWP::UserAgent->new( %ua_opts );
     $self->{ua}->agent(
