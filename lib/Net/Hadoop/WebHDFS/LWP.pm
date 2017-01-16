@@ -116,12 +116,14 @@ sub request {
     my $errmsg = $res->{body} || 'Response body is empty...';
     $errmsg =~ s/\n//g;
 
-    my %html_error;
+    # Attempt to strigfy the HTML message
     if ( $errmsg =~ m{ \A <html.+?> }xmsi ) {
-        if ( my @error = $self->_parse_error_from_html( $errmsg ) ) {
-            %html_error = @error;
+        if ( my @errors = $self->_parse_error_from_html( $errmsg ) ) {
+            # @error can also be assigned to a hash as it is mapped
+            # to kay=>value pairs, however strigifying the message
+            # is enough for now
             my @flat;
-            while ( my ( $key, $val ) = splice( @error, 0, 2 ) ) {
+            while ( my ( $key, $val ) = splice( @errors, 0, 2 ) ) {
                 push @flat, "$key: $val"
             }
             # reset to something meaningful now that we've removed the html cruft
@@ -129,13 +131,14 @@ sub request {
         }
     }
 
-    if ( $code == 400 ) { croak "ClientError: $errmsg"; }
-
-    # this error happens for secure clusters when using Net::Hadoop::WebHDFS,
-    # but LWP::Authen::Negotiate takes care of it transparently in this module.
-    # we still may get this error on a secure cluster, when the credentials
-    # cache hasn't been initialized
+    if ( $code == 400 ) {
+        croak "ClientError: $errmsg";
+    }
     elsif ( $code == 401 ) {
+        # this error happens for secure clusters when using Net::Hadoop::WebHDFS,
+        # but LWP::Authen::Negotiate takes care of it transparently in this module.
+        # we still may get this error on a secure cluster, when the credentials
+        # cache hasn't been initialized
         my $extramsg = ( $headers->{'www-authenticate'} || '' ) eq 'Negotiate'
             ? eval { require LWP::Authen::Negotiate; 1; }
                 ? q{ (Did you forget to run kinit?)}
@@ -143,7 +146,6 @@ sub request {
             : '';
         croak "SecurityError$extramsg: $errmsg";
     }
-
     elsif ( $code == 403 ) {
         if ( $errmsg =~ m{ \Qorg.apache.hadoop.ipc.StandbyException\E }xms ) {
             if ( $self->{httpfs_mode} || not defined( $self->{standby_host} ) ) {
@@ -175,10 +177,17 @@ sub request {
         }
         croak "IOError: $errmsg";
     }
-    elsif ( $code == 404 ) { croak "FileNotFoundError: $errmsg"; }
-    elsif ( $code == 500 ) { croak "ServerError: $errmsg"; }
+    elsif ( $code == 404 ) {
+        croak "FileNotFoundError: $errmsg";
+    }
+    elsif ( $code == 500 ) {
+        croak "ServerError: $errmsg";
+    }
+    else {
+        croak "RequestFailedError, code:$code, message:$errmsg";
+    }
 
-    croak "RequestFailedError, code:$code, message:$errmsg";
+    return;
 }
 
 sub _parse_error_from_html {
