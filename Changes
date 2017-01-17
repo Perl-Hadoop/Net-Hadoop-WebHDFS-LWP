@@ -1,6 +1,8 @@
 Revision history for Net-Hadoop-WebHDFS-LWP
 
 {{$NEXT}}
+
+0.009 2017-01-17 BURAK
         Parse / cleanup the HTML response returned from the endpoints
                 (happens with GSSAPI - secure clusters).
                 Ideally we should always receive json and such but unfortunately
