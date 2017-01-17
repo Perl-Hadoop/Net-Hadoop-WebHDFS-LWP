@@ -1,6 +1,12 @@
 Revision history for Net-Hadoop-WebHDFS-LWP
 
 {{$NEXT}}
+        Parse / cleanup the HTML response returned from the endpoints
+                (happens with GSSAPI - secure clusters).
+                Ideally we should always receive json and such but unfortunately
+                Hadoop is broken in some ways in this regard.
+        The feature also makes HTML::Parser a recommended module.
+        Cleanup / rework some internal parts.
 
 0.008   2016-09-30
         Pass proxy settings to the UA object (Yati Sagade).
