@@ -298,3 +298,7 @@ documentation is contained in L<Net::Hadoop::WebHDFS>.
 As mentioned above, the real work was done by Satoshi Tagomori
 
 Thanks to my employer Booking.com to allow me to release this module for public use
+
+=for Pod::Coverage request
+
+=cut
