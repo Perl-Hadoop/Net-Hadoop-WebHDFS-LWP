@@ -22,34 +22,31 @@ sub new {
     my $class   = shift;
     my %options = @_;
     my $debug   = delete $options{debug} || 0;
+
     require Data::Dumper if $debug;
 
     my $self = $class->SUPER::new(@_);
 
     # we don't need Furl
     delete $self->{furl};
+
     $self->{debug} = $debug;
 
-    my %ua_opts = map {
-        exists $options{$_} ? (
-            $_ => $options{ $_ }
-        ) : ()
-    } UA_PASSTHROUGH_OPTIONS;
-
-    $self->{ua} = LWP::UserAgent->new( %ua_opts );
-    $self->{ua}->agent(
-        sprintf "%s %s",
-                    $class,
-                    $class->VERSION || 'beta',
-    );
-    $self->{useragent} = $self->{ua}->agent;
-
     # default timeout is a bit short, raise it
-    $self->{timeout} = $options{timeout} || 30;
-    $self->{ua}->timeout( $self->{timeout} );
+    $self->{timeout}   = $options{timeout}   || 30;
 
     # For filehandle upload support
     $self->{chunksize} = $options{chunksize} || 4096;
+
+    $self->{ua_opts} = {
+        map {
+            exists $options{$_} ? (
+                $_ => $options{ $_ }
+            ) : ()
+        } UA_PASSTHROUGH_OPTIONS
+    };
+
+    $self->_create_ua;
 
     return $self;
 }
@@ -192,6 +189,26 @@ sub request {
 
     # catch-all exception
     croak "RequestFailedError, code:$code, message:$errmsg";
+}
+
+sub _create_ua {
+    my $self  = shift;
+    my $class = ref $self;
+
+    $self->{ua} = LWP::UserAgent->new(
+                        %{ $self->{ua_opts} }
+                    );
+
+    $self->{ua}->agent(
+        sprintf "%s %s",
+                    $class,
+                    $class->VERSION || 'beta',
+    );
+
+    $self->{useragent} = $self->{ua}->agent;
+    $self->{ua}->timeout( $self->{timeout} );
+
+    return $self;
 }
 
 sub _parse_error_from_html {
