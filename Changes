@@ -1,6 +1,8 @@
 Revision history for Net-Hadoop-WebHDFS-LWP
 
 {{$NEXT}}
+
+0.010 2017-05-04 BURAK
 	Whitelist setting a cookie jar.
 
 0.009 2017-01-17 BURAK
