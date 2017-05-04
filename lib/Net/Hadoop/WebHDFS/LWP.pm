@@ -13,6 +13,7 @@ use Scalar::Util qw( openhandle );
 use HTTP::Request::StreamingUpload;
 
 use constant UA_PASSTHROUGH_OPTIONS => qw(
+    cookie_jar
     env_proxy
     no_proxy
     proxy
