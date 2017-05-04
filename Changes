@@ -1,6 +1,7 @@
 Revision history for Net-Hadoop-WebHDFS-LWP
 
 {{$NEXT}}
+	Whitelist setting a cookie jar.
 
 0.009 2017-01-17 BURAK
         Parse / cleanup the HTML response returned from the endpoints
