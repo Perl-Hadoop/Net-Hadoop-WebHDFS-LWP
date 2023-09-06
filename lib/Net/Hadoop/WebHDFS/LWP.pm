@@ -197,7 +197,13 @@ sub _create_ua {
     my $class = ref $self;
 
     $self->{ua} = LWP::UserAgent->new(
-                        %{ $self->{ua_opts} }
+                        requests_redirectable => [qw(
+                            GET
+                            HEAD
+                            POST
+                            PUT
+                        )],
+                        %{ $self->{ua_opts} },
                     );
 
     $self->{ua}->agent(
